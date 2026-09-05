@@ -1,0 +1,15 @@
+name: tick
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: LiderBorsa dinle
+        env:
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+        run: gh workflow run "Telegram dinle" --repo OnderGames/LiderBorsa
