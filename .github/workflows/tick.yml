@@ -1,16 +1,37 @@
 name: tick
 
 on:
-  push:
-  schedule:
-    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 jobs:
-  tick:
+  poll:
     runs-on: ubuntu-latest
     steps:
-      - name: LiderBorsa dinle
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Offset
+        uses: actions/cache@v4
+        with:
+          path: telegram_offset.txt
+          key: tg-offset
+      - name: Komut
+        id: tg
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python poll.py
+      - name: Liste tara
+        if: steps.tg.outputs.need_scan == 'true'
         env:
           GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
-        run: gh workflow run "Telegram dinle" --repo OnderGames/LiderBorsa
+        run: |
+          gh workflow run "Cloud tarama" --repo OnderGames/LiderBorsa             -f "market=${{ steps.tg.outputs.market }}"             -f notify_all=true
+      - name: Tekrar dinle
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+        run: |
+          sleep 90
+          gh workflow run tick --repo OnderGames/liderborsa-tick
