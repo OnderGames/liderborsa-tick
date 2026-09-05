@@ -159,19 +159,15 @@ def main() -> int:
                     "disable_web_page_preview": True,
                 },
             )
-        elif command:
-            _api(
-                token,
-                "sendMessage",
-                {
-                    "chat_id": reply_to,
-                    "text": "Bilinmeyen komut. /yardim yazin.",
-                    "disable_web_page_preview": True,
-                },
-            )
 
     if max_id:
         _save_offset(max_id)
+        _api(
+            token,
+            "getUpdates",
+            {"offset": max_id, "timeout": 0, "allowed_updates": ["message"]},
+        )
+        print(f"confirmed_offset={max_id}")
 
     _write_output(need_scan, market, need_scan)
     return 0

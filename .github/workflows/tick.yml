@@ -33,5 +33,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
         run: |
-          sleep 90
+          sleep 180
           gh workflow run tick --repo OnderGames/liderborsa-tick
